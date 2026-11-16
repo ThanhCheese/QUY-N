@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trắc nghiệm Nghệ thuật Lãnh đạo</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: #eef2f7; color: #1e293b; line-height: 1.6;
+    min-height: 100vh; padding: 18px 14px 0;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 820px; margin: 0 auto; padding-bottom: 60px; }
+  .wrap.has-submit { padding-bottom: 110px; }
+
+  h1 { font-size: 24px; letter-spacing: -0.3px; }
+  .muted { color: #64748b; font-size: 14px; }
+
+  .card {
+    background: #fff; border-radius: 16px; padding: 20px;
+    box-shadow: 0 1px 3px rgba(15,23,42,.07), 0 8px 24px -12px rgba(15,23,42,.15);
+    margin-bottom: 16px;
+  }
+
+  /* ---------- Buttons ---------- */
+  .btn {
+    font-family: inherit; font-size: 15px; font-weight: 600;
+    border-radius: 12px; border: 1.5px solid transparent;
+    padding: 12px 20px; cursor: pointer; transition: all .15s;
+  }
+  .btn.primary { background: #2563eb; color: #fff; }
+  .btn.primary:hover { background: #1d4ed8; }
+  .btn.ghost { background: #fff; color: #2563eb; border-color: #bfdbfe; }
+  .btn.ghost:hover { background: #eff6ff; }
+  .btn.soft { background: #f1f5f9; color: #334155; }
+  .btn.soft:hover { background: #e2e8f0; }
+  .btn.block { width: 100%; }
+  .btn:disabled { opacity: .4; cursor: not-allowed; }
+  .btn.success { background: #16a34a; color:#fff; }
+  .btn.success:hover { background:#15803d; }
+
+  /* ---------- Home ---------- */
+  .hero { text-align: center; padding: 40px 24px; }
+  .hero h1 { font-size: 28px; margin-bottom: 8px; }
+  .hero .sub { color: #64748b; margin-bottom: 26px; font-size: 15px; }
+  .hero-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .hero-actions .btn { min-width: 180px; }
+  .badge-count {
+    display: inline-block; background: #eff6ff; color: #1d4ed8;
+    font-size: 13px; font-weight: 700; padding: 4px 12px;
+    border-radius: 99px; margin-bottom: 14px;
+  }
+
+  /* ---------- Test topbar ---------- */
+  .topbar { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+  .chip {
+    font-size: 13px; font-weight: 700; color: #334155;
+    background: #fff; padding: 6px 12px; border-radius: 99px;
+    white-space: nowrap; box-shadow: 0 1px 2px rgba(15,23,42,.08);
+  }
+  .progress { flex: 1; height: 8px; background: #dbe3ee; border-radius: 99px; overflow: hidden; }
+  .progress > div {
+    height: 100%; width: 0;
+    background: linear-gradient(90deg, #3b82f6, #6366f1);
+    border-radius: 99px; transition: width .3s;
+  }
+
+  /* ---------- Question ---------- */
+  .qnum {
+    font-size: 13px; font-weight: 800; color: #2563eb;
+    text-transform: uppercase; letter-spacing: .6px; margin-bottom: 8px;
+  }
+  .qtext { font-size: 16.5px; font-weight: 600; margin-bottom: 18px; }
+
+  .options { display: flex; flex-direction: column; gap: 10px; }
+  .option {
+    display: flex; gap: 12px; align-items: flex-start; width: 100%;
+    text-align: left; padding: 12px 14px; border: 1.5px solid #e2e8f0;
+    border-radius: 12px; background: #fff; cursor: pointer;
+    font-size: 15px; color: inherit; font-family: inherit; line-height: 1.5;
+    transition: all .15s;
+  }
+  .option:hover { border-color: #93c5fd; background: #f8fbff; }
+  .option.selected { border-color: #2563eb; background: #eff6ff; }
+  .option.selected .letter { background: #2563eb; color: #fff; }
+  .letter {
+    flex: 0 0 26px; height: 26px; border-radius: 50%;
+    background: #e2e8f0; color: #475569; display: grid; place-items: center;
+    font-weight: 800; font-size: 13px; transition: all .15s; margin-top: 1px;
+  }
+
+  /* ---------- Review states ---------- */
+  .option.correct { border-color: #16a34a; background: #f0fdf4; }
+  .option.correct .letter { background: #16a34a; color: #fff; }
+  .option.wrong { border-color: #dc2626; background: #fef2f2; }
+  .option.wrong .letter { background: #dc2626; color: #fff; }
+  .option.dim { opacity: .62; }
+
+  .tag {
+    display: inline-block; font-size: 11.5px; font-weight: 800;
+    padding: 2px 9px; border-radius: 99px; margin-left: 8px;
+    vertical-align: middle;
+  }
+  .tag.ok { background: #dcfce7; color: #15803d; }
+  .tag.no { background: #fee2e2; color: #b91c1c; }
+
+  /* ---------- Nav ---------- */
+  .nav { display: flex; gap: 10px; margin-bottom: 16px; }
+  .nav .btn { flex: 1; }
+
+  /* ---------- Question grid ---------- */
+  .grid-title { font-size: 13px; font-weight: 700; color: #64748b; margin-bottom: 10px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(42px, 1fr)); gap: 8px; }
+  .gnum {
+    aspect-ratio: 1; border-radius: 10px; border: 1.5px solid #e2e8f0;
+    background: #fff; color: #475569; font-weight: 700; font-size: 13px;
+    font-family: inherit; cursor: pointer; transition: all .15s;
+  }
+  .gnum:hover { border-color: #93c5fd; }
+  .gnum.done { background: #dbeafe; border-color: #bfdbfe; color: #1d4ed8; }
+  .gnum.active { background: #2563eb; border-color: #2563eb; color: #fff; }
+
+  /* ---------- Sticky submit bar ---------- */
+  .submit-bar {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 50;
+    background: #fff; border-top: 1px solid #e2e8f0;
+    padding: 12px 14px calc(12px + env(safe-area-inset-bottom));
+    box-shadow: 0 -6px 24px -8px rgba(15,23,42,.18);
+  }
+  .submit-bar .inner { max-width: 820px; margin: 0 auto; display: flex; gap: 10px; align-items: center; }
+  .submit-bar .hint { flex: 1; font-size: 13px; color: #64748b; }
+  .submit-bar .hint b { color: #1e293b; }
+  .submit-bar .btn { min-width: 150px; }
+
+  /* ---------- Modal ---------- */
+  .modal-backdrop {
+    position: fixed; inset: 0; z-index: 100;
+    background: rgba(15,23,42,.45);
+    display: grid; place-items: center; padding: 20px;
+    animation: fade .18s ease;
+  }
+  .modal-backdrop[hidden] { display: none; }
+  @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+  .modal {
+    background: #fff; border-radius: 16px; padding: 22px;
+    width: 100%; max-width: 380px; text-align: center;
+    box-shadow: 0 20px 60px -12px rgba(15,23,42,.4);
+  }
+  .modal h3 { font-size: 18px; margin-bottom: 8px; }
+  .modal p { color: #475569; font-size: 14.5px; margin-bottom: 20px; }
+  .modal-actions { display: flex; gap: 10px; }
+  .modal-actions .btn { flex: 1; }
+
+  /* ---------- Result ---------- */
+  .result-head { text-align: center; padding: 8px 0 4px; }
+  .score-ring {
+    width: 140px; height: 140px; border-radius: 50%; margin: 0 auto 18px;
+    display: grid; place-items: center;
+  }
+  .score-ring .inner {
+    width: 112px; height: 112px; border-radius: 50%; background: #fff;
+    display: grid; place-items: center; align-content: center;
+  }
+  .score-num { font-size: 30px; font-weight: 800; line-height: 1.1; }
+  .score-lbl { font-size: 12.5px; color: #64748b; font-weight: 700; margin-top: 2px; }
+  .result-msg { font-size: 19px; font-weight: 800; margin-bottom: 4px; }
+
+  .stat-row { display: flex; gap: 10px; margin-top: 18px; }
+  .stat {
+    flex: 1; background: #f8fafc; border-radius: 12px; padding: 12px;
+    text-align: center;
+  }
+  .stat b { display: block; font-size: 20px; }
+  .stat span { font-size: 12px; color: #64748b; font-weight: 600; }
+
+  /* ---------- Review list ---------- */
+  .review-item { margin-bottom: 16px; }
+  .answer-note {
+    font-size: 13.5px; color: #15803d; font-weight: 700;
+    margin-top: 10px; padding: 8px 12px; background: #f0fdf4;
+    border-radius: 10px;
+  }
+  .divider { height: 1px; background: #e2e8f0; margin: 18px 0; }
+  .page-title { font-size: 20px; font-weight: 800; margin-bottom: 4px; }
+  .page-sub { color: #64748b; font-size: 14px; margin-bottom: 18px; }
+
+  @media (max-width: 520px) {
+    .hero h1 { font-size: 23px; }
+    .qtext { font-size: 15.5px; }
+    .topbar .chip:last-child { display: none; }
+    .submit-bar .hint { display: none; }
+    .submit-bar .btn { width: 100%; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+
+<!-- Modal xác nhận nộp bài (tự vẽ, không dùng confirm) -->
+<div class="modal-backdrop" id="modal" hidden>
+  <div class="modal">
+    <h3 id="modal-title">Nộp bài?</h3>
+    <p id="modal-msg"></p>
+    <div class="modal-actions">
+      <button class="btn soft" data-modal="cancel">Làm tiếp</button>
+      <button class="btn primary" data-modal="confirm">Nộp bài</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============ DỮ LIỆU CÂU HỎI ============ */
+const QUESTIONS = [
+  { q:`Chị Lan tuyên bố mọi thành viên phải tuân thủ thời hạn báo cáo. Bản thân chị luôn nộp đúng hạn; khi có lần chậm trễ, chị công khai nhận trách nhiệm và thực hiện biện pháp khắc phục như đã cam kết. Biểu hiện nào sau đây của người lãnh đạo được thể hiện rõ nhất?`,
+    options:[`Khả năng dự báo biến động của môi trường.`,`Sự linh hoạt trong lựa chọn phong cách lãnh đạo.`,`Sự nhất quán giữa lời nói và hành động.`,`Khả năng diễn đạt thông điệp hấp dẫn.`], answer:2 },
+  { q:`Hai trưởng bộ phận P và Q đều tổ chức công việc rõ ràng và hoàn thành tốt nhiệm vụ. P còn quan tâm sâu sát đến nhân viên, trong khi Q ít chú ý đến nhu cầu của họ. Một người đánh giá xếp cả hai vào nhóm "lãnh đạo độc tài" vì đều tập trung vào hoàn thành nhiệm vụ. Phân tích nào sau đây phù hợp nhất với mô hình Ohio và Mạng lưới lãnh đạo trong giáo trình?`,
+    options:[`Không thể phân biệt P với Q bằng mô hình Ohio, vì mô hình yêu cầu lựa chọn một trong hai hướng công việc hoặc nhân viên.`,`Cách xếp loại bỏ qua chiều quan tâm con người; P gắn với lãnh đạo nhóm, còn Q gắn với lãnh đạo độc tài theo mô tả.`,`Cách xếp loại hợp lý, vì kết quả hoàn thành nhiệm vụ là tiêu chí quyết định nhóm lãnh đạo, còn quan hệ chỉ có ý nghĩa bổ sung.`,`Cần chuyển P sang lãnh đạo câu lạc bộ, vì quan tâm sâu sát đến nhân viên là dấu hiệu đủ để xác định nhóm lãnh đạo này.`], answer:1 },
+  { q:`Khi nhân viên liên tục phải làm thêm vì thủ tục rườm rà, trưởng bộ phận trực tiếp làm việc với các phòng liên quan để gỡ vướng và bảo đảm nhóm có đủ công cụ. Bà ưu tiên nhu cầu chính đáng của nhân viên, tạo điều kiện để họ phát triển và dành sự ghi nhận cho tập thể khi công việc thành công. Xác định phong cách lãnh đạo được thể hiện rõ nhất trong tình huống này:`,
+    options:[`Phong cách lãnh đạo huấn luyện.`,`Phong cách lãnh đạo phụng sự.`,`Phong cách lãnh đạo dân chủ.`,`Phong cách lãnh đạo gắn kết.`], answer:1 },
+  { q:`Một sinh viên nhận xét: "Mô hình Hill chỉ quan tâm đến hoàn thành nhiệm vụ, còn mô hình John Adair chỉ quan tâm đến con người". Nhận định nào sau đây đánh giá đúng ý kiến này?`,
+    options:[`Đúng, vì John Adair đặt nhu cầu con người ngoài yêu cầu hoàn thành công việc.`,`Đúng, vì Hill xem nhiệm vụ là nội dung duy nhất quyết định hiệu quả nhóm.`,`Sai, vì cả hai đều quan tâm công việc và con người nhưng có trọng tâm tiếp cận khác nhau.`,`Sai, vì Hill chỉ xem xét môi trường, còn John Adair chỉ xem xét kết quả công việc.`], answer:2 },
+  { q:`Nhận định nào sau đây phân biệt đúng vai trò của nhiệt tình và kiên nhẫn trong lãnh đạo?`,
+    options:[`Nhiệt tình tạo sự hăng hái nhưng cần phương pháp khoa học; kiên nhẫn giúp đối diện khó khăn mà không phản ứng tiêu cực.`,`Nhiệt tình cho phép rút ngắn việc lựa chọn phương pháp; kiên nhẫn đòi hỏi chấp nhận mọi cách ứng xử của cấp dưới.`,`Nhiệt tình cần được duy trì khi công việc thuận lợi; kiên nhẫn cần được thay thế bằng sự nóng giận khi tiến độ chậm trễ.`,`Nhiệt tình chủ yếu giúp kiềm chế phản ứng trước chậm trễ; kiên nhẫn chủ yếu tạo hứng thú và truyền cảm hứng làm việc.`], answer:0 },
+  { q:`Điểm khác biệt trọng tâm giữa quan niệm "lãnh đạo là một nhân cách" và quan niệm "lãnh đạo là hành vi" là gì?`,
+    options:[`Một bên nhấn mạnh việc thực hiện mục đích; bên kia nhấn mạnh phản ứng của người dưới quyền.`,`Một bên nhấn mạnh chức vụ được bổ nhiệm; bên kia nhấn mạnh các quan hệ cá nhân sẵn có.`,`Một bên nhấn mạnh quan hệ với cấp dưới; bên kia nhấn mạnh mức sở hữu nguồn lực vật chất.`,`Một bên nhấn mạnh phẩm chất cá nhân; bên kia nhấn mạnh cách tác động và dẫn dắt hoạt động.`], answer:3 },
+  { q:`Phong cách lãnh đạo hợp lý cần đáp ứng yêu cầu nào sau đây?`,
+    options:[`Tập trung vào mục tiêu sản xuất và giảm sự khác biệt về nhu cầu giữa các thành viên.`,`Đáp ứng nhu cầu của người lao động và phát huy sức mạnh cá nhân, tập thể.`,`Ưu tiên nhu cầu riêng của nhân viên và để từng người tự xác định mục tiêu làm việc.`,`Duy trì cách làm của lãnh đạo và tạo điều kiện để nhân viên thích nghi với cách đó.`], answer:1 },
+  { q:`Nhân cách người lãnh đạo được xác định là kiểu nhân cách nào sau đây?`,
+    options:[`Kiểu nhân cách hình thành từ chức vụ, có những quyền hạn và đặc quyền tương ứng với vị trí trong tổ chức.`,`Kiểu nhân cách dựa trên tài năng chuyên môn, có những hiểu biết vượt trội trong tất cả lĩnh vực của tổ chức.`,`Kiểu nhân cách xã hội đặc thù, có những đặc điểm và phẩm chất tâm lý phù hợp với yêu cầu của hoạt động lãnh đạo.`,`Kiểu nhân cách do bẩm sinh quyết định, có những đặc điểm ổn định không thay đổi qua quá trình rèn luyện.`], answer:2 },
+  { q:`Khi xây dựng lịch làm việc mới, trưởng bộ phận tự quyết định thời gian và phân công nhiệm vụ cho từng người. Dù nhân viên đề nghị trao đổi về những điểm bất hợp lý, ông vẫn yêu cầu thực hiện nguyên phương án và chỉ điều chỉnh khi chính ông thấy cần thiết. Xác định phong cách lãnh đạo được thể hiện rõ nhất trong tình huống này:`,
+    options:[`Phong cách lãnh đạo độc đoán.`,`Phong cách lãnh đạo dẫn đầu.`,`Phong cách lãnh đạo dân chủ.`,`Phong cách lãnh đạo giao dịch.`], answer:0 },
+  { q:`Trưởng nhóm phân tích thường trực tiếp hoàn thành những báo cáo khó với tốc độ nhanh và chất lượng cao. Anh lấy kết quả của mình làm chuẩn, yêu cầu các thành viên theo kịp nhịp làm việc đó và nhanh chóng làm lại những phần chưa đạt thay vì dành nhiều thời gian hướng dẫn. Xác định phong cách lãnh đạo được thể hiện rõ nhất trong tình huống này:`,
+    options:[`Phong cách lãnh đạo dẫn đầu.`,`Phong cách lãnh đạo độc đoán.`,`Phong cách lãnh đạo chuyển đổi.`,`Phong cách lãnh đạo giao dịch.`], answer:0 },
+  { q:`Điểm khác biệt cốt lõi giữa "lãnh đạo nhóm" và "nhóm lãnh đạo" là gì?`,
+    options:[`Lãnh đạo nhóm có người đứng đầu chính thức; nhóm lãnh đạo không cần người đứng đầu và cơ chế kiểm soát.`,`Lãnh đạo nhóm chú trọng kết quả công việc; nhóm lãnh đạo chỉ chú trọng quan hệ giữa các thành viên.`,`Lãnh đạo nhóm tập trung chức năng ở người đứng đầu; nhóm lãnh đạo chia sẻ chức năng và trách nhiệm trong nhóm.`,`Lãnh đạo nhóm phù hợp với tập thể nhỏ; nhóm lãnh đạo chỉ phù hợp với tập thể có quy mô lớn.`], answer:2 },
+  { q:`Một nhóm sáng tạo được tự xác định mục tiêu hoạt động, lựa chọn dự án, phân chia công việc và đánh giá kết quả. Trưởng bộ phận hầu như không tham gia điều hành, không yêu cầu duyệt trước các quyết định và chủ yếu cung cấp nguồn lực khi nhóm đề nghị. Xác định phong cách lãnh đạo được thể hiện rõ nhất trong tình huống này:`,
+    options:[`Phong cách lãnh đạo phụng sự.`,`Phong cách lãnh đạo dân chủ.`,`Phong cách lãnh đạo tự do.`,`Phong cách lãnh đạo giao dịch.`], answer:2 },
+  { q:`Một nhân viên làm tốt công việc hiện tại nhưng muốn trở thành trưởng nhóm. Người quản lý cùng nhân viên xác định năng lực cần bổ sung, giao nhiệm vụ tăng dần độ khó và dành thời gian phản hồi sau mỗi lần thực hiện. Hai người định kỳ xem xét mức tiến bộ để điều chỉnh kế hoạch phát triển. Xác định phong cách lãnh đạo được thể hiện rõ nhất trong tình huống này:`,
+    options:[`Phong cách lãnh đạo ủy quyền.`,`Phong cách lãnh đạo gắn kết.`,`Phong cách lãnh đạo phụng sự.`,`Phong cách lãnh đạo huấn luyện.`], answer:3 },
+  { q:`Một doanh nghiệp muốn xác định phong cách của hai trưởng bộ phận có cùng cấp bậc và thâm niên. Cách thu thập thông tin nào sau đây phù hợp nhất?`,
+    options:[`Đối chiếu chuyên ngành đào tạo và số năm công tác của hai trưởng bộ phận.`,`Dựa vào phong cách mà mỗi trưởng bộ phận tự lựa chọn trong bản giới thiệu cá nhân.`,`Quan sát cách mỗi người sử dụng quyền lực và ứng xử khi giải quyết các tình huống công việc.`,`So sánh quyền hạn được ghi trong quyết định bổ nhiệm của hai trưởng bộ phận.`], answer:2 },
+  { q:`Đầu tháng, trưởng nhóm thống nhất với nhân viên về chỉ tiêu xử lý hồ sơ, mức chất lượng và khoản thưởng tương ứng. Cuối tháng, ông đối chiếu kết quả với cam kết để xét thưởng; những trường hợp không đạt phải thực hiện biện pháp khắc phục theo quy định đã thông báo. Xác định phong cách lãnh đạo được thể hiện rõ nhất trong tình huống này:`,
+    options:[`Phong cách lãnh đạo giao dịch.`,`Phong cách lãnh đạo dẫn đầu.`,`Phong cách lãnh đạo đức.`,`Phong cách lãnh đạo độc đoán.`], answer:0 },
+  { q:`Sau một đợt tái cơ cấu, các thành viên ít trao đổi và thường nghi ngờ nhau. Trưởng phòng dành thời gian gặp gỡ để lắng nghe cảm xúc, tổ chức những cuộc trò chuyện cởi mở và ghi nhận sự hỗ trợ giữa đồng nghiệp. Trước mắt, bà ưu tiên khôi phục quan hệ và cảm giác thuộc về tập thể. Xác định phong cách lãnh đạo được thể hiện rõ nhất trong tình huống này:`,
+    options:[`Phong cách lãnh đạo gắn kết.`,`Phong cách lãnh đạo huấn luyện.`,`Phong cách lãnh đạo phụng sự.`,`Phong cách lãnh đạo dân chủ.`], answer:0 },
+  { q:`Một chuyên viên không chỉ hoàn thành xuất sắc phần việc của mình mà còn phối hợp hiệu quả, chia sẻ chuyên môn và đóng góp trực tiếp vào việc đạt mục tiêu chung của nhóm. Chưa có dữ liệu cho thấy người này tổ chức nguồn lực hoặc dẫn dắt tầm nhìn. Cấp độ nào sau đây của Jim Collins được thể hiện rõ nhất?`,
+    options:[`Cấp độ 1 – Cá nhân có năng lực.`,`Cấp độ 2 – Đóng góp cho đội nhóm.`,`Cấp độ 3 – Người quản lý có thẩm quyền.`,`Cấp độ 4 – Nhà lãnh đạo hiệu quả.`], answer:1 },
+  { q:`Một giám đốc đã tạo được kết quả kinh doanh tốt và được nhân viên tin tưởng nhờ thành tích đó. Ông muốn tiến lên cấp độ 4 theo Maxwell. Hành động nào sau đây phù hợp trực tiếp nhất?`,
+    options:[`Lựa chọn, bồi dưỡng và tạo cơ hội cho những nhân viên có khả năng trở thành lãnh đạo kế tiếp.`,`Tăng mục tiêu sản lượng cá nhân của bản thân để tiếp tục chứng minh năng lực tạo kết quả.`,`Giữ lại các quyết định quan trọng để bảo đảm kết quả tiếp tục phụ thuộc vào kinh nghiệm của mình.`,`Mở rộng quyền hạn chức vụ để có thể kiểm soát công việc của nhiều bộ phận hơn trước.`], answer:0 },
+  { q:`Một người lãnh đạo có lúc sử dụng phong cách tự do, có lúc dân chủ, có khi áp đặt. Nhận định nào sau đây giải thích phù hợp nhất hiện tượng này?`,
+    options:[`Phong cách chủ yếu do chức danh quyết định, nên thay đổi phong cách phản ánh sự thay đổi quyền hạn.`,`Phong cách chủ yếu do cấp dưới quyết định, nên cá tính của người đứng đầu ít có ý nghĩa.`,`Phong cách có tính đa dạng, linh hoạt và dấu ấn cá nhân, qua đó thể hiện kỹ năng, nghệ thuật lãnh đạo.`,`Phong cách có thể thay đổi, nhưng nghệ thuật lãnh đạo chỉ thể hiện khi duy trì một cách tác động.`], answer:2 },
+  { q:`Trong đợt tuyển dụng, trưởng phòng phát hiện một ứng viên là người thân của lãnh đạo cấp cao. Bà yêu cầu áp dụng cùng tiêu chí đánh giá cho mọi ứng viên, công khai cách chấm điểm và từ chối đề nghị ưu tiên. Bà cũng yêu cầu thành viên hội đồng khai báo quan hệ có thể ảnh hưởng đến tính công bằng. Xác định phong cách lãnh đạo được thể hiện rõ nhất trong tình huống này:`,
+    options:[`Phong cách lãnh đạo chân thực.`,`Phong cách lãnh đạo đạo đức.`,`Phong cách lãnh đạo độc đoán.`,`Phong cách lãnh đạo giao dịch.`], answer:0 },
+  { q:`Phòng kinh doanh cần lựa chọn cách tiếp cận một nhóm khách hàng mới. Trưởng phòng yêu cầu các thành viên đề xuất phương án, tổ chức thảo luận ưu điểm và hạn chế của từng cách. Sau khi trao đổi, cả nhóm thống nhất phương án triển khai; trưởng phòng chịu trách nhiệm tổ chức thực hiện. Xác định phong cách lãnh đạo được thể hiện rõ nhất trong tình huống này:`,
+    options:[`Phong cách lãnh đạo tự do.`,`Phong cách lãnh đạo định hướng tầm nhìn.`,`Phong cách lãnh đạo huấn luyện.`,`Phong cách lãnh đạo dân chủ.`], answer:3 },
+  { q:`Thang phong cách lãnh đạo của Tannenbaum và Schmidt gợi ý điều gì về việc lựa chọn phong cách?`,
+    options:[`Lựa chọn phong cách theo mong muốn của nhân viên để giảm vai trò quyết định của lãnh đạo.`,`Lựa chọn phong cách theo áp lực thời gian để xác định mức độ tập trung quyền lực cần thiết.`,`Lựa chọn phong cách theo thói quen của lãnh đạo để duy trì sự nhất quán trong mọi nhiệm vụ.`,`Lựa chọn phong cách trên cơ sở xem xét người lãnh đạo, nhân viên và những tác động của tình huống.`], answer:3 },
+  { q:`Lan và Hà làm cùng vị trí, có kinh nghiệm tương đương. Lan thường xuyên đảm nhiệm thêm công việc và đạt chất lượng tốt nhưng nhận mức thưởng ngang Hà. Trước đó Lan hài lòng với khoản thưởng; sau khi so sánh đóng góp và đãi ngộ giữa hai người, chị cảm thấy thiệt thòi và giảm mức cố gắng. Học thuyết nào sau đây giải thích trực tiếp nhất phản ứng của Lan?`,
+    options:[`Học thuyết công bằng của Adams.`,`Học thuyết hai nhân tố của Herzberg.`,`Học thuyết X–Y của McGregor.`,`Học thuyết kỳ vọng của Vroom.`], answer:0 },
+  { q:`Công ty công bố khoản thưởng hấp dẫn cho nhân viên vượt chi tiêu. Minh tin rằng mình đủ khả năng đạt chi tiêu nếu nỗ lực thêm, nhưng anh không tăng mức cố gắng vì nhiều lần trước công ty đã không trả thưởng như cam kết. Anh cho rằng đạt kết quả tốt cũng chưa chắc nhận được phần thưởng. Học thuyết nào sau đây giải thích trực tiếp nhất việc Minh thiếu động lực?`,
+    options:[`Học thuyết X–Y của McGregor.`,`Học thuyết kỳ vọng của Vroom.`,`Học thuyết công bằng của Adams.`,`Học thuyết nhu cầu của Maslow.`], answer:1 },
+  { q:`Trưởng phòng cho rằng nhu cầu của nhân viên được sắp xếp theo thứ bậc; nhu cầu ở bậc cao hơn thường trở thành trọng tâm khi những nhu cầu ở bậc thấp đã được đáp ứng tương đối. Ông lựa chọn biện pháp động viên theo thứ tự đó. Cách tiếp cận này phù hợp rõ nhất với học thuyết nào sau đây?`,
+    options:[`Học thuyết hai nhân tố của Herzberg.`,`Học thuyết nhu cầu của Maslow.`,`Học thuyết ERG của Alderfer.`,`Học thuyết công bằng của Adams.`], answer:1 },
+  { q:`Anh Nam cho rằng nhân viên thường né tránh công việc nên cần giám sát chặt chẽ và nhắc nhở thường xuyên. Chị Lan lại tin rằng nhân viên có thể chủ động, sáng tạo và sẵn sàng nhận trách nhiệm khi được tạo điều kiện; vì vậy, chị khuyến khích họ tham gia quyết định cách thực hiện công việc. Quan điểm của anh Nam và chị Lan lần lượt phù hợp với học thuyết nào sau đây của McGregor?`,
+    options:[`Anh Nam theo thuyết X; chị Lan theo thuyết X.`,`Anh Nam theo thuyết Y; chị Lan theo thuyết X.`,`Anh Nam theo thuyết Y; chị Lan theo thuyết Y.`,`Anh Nam theo thuyết X; chị Lan theo thuyết Y.`], answer:3 },
+  { q:`Công ty cải thiện phòng làm việc, điều chỉnh chính sách lương và làm rõ các quy định nội bộ. Nhân viên ít phàn nàn hơn nhưng chưa hào hứng với công việc. Sau đó, trưởng phòng giao những nhiệm vụ có ý nghĩa, tăng trách nhiệm và ghi nhận thành tích; nhân viên bắt đầu chủ động đề xuất cải tiến. Diễn biến trên phù hợp rõ nhất với học thuyết nào sau đây?`,
+    options:[`Học thuyết ERG của Alderfer.`,`Học thuyết hai nhân tố của Herzberg.`,`Học thuyết nhu cầu của Maslow.`,`Học thuyết công bằng của Adams.`], answer:1 },
+  { q:`Vì sao tăng tiền thưởng chưa chắc đã đủ để khích lệ nhân viên một cách hiệu quả?`,
+    options:[`Vì tiền thưởng chỉ có ý nghĩa đối với nhân viên mới, còn nhân viên lâu năm không quan tâm đến thu nhập.`,`Vì nhân viên còn có nhu cầu được tin tưởng, tôn trọng, quan tâm và ghi nhận, bên cạnh nhu cầu vật chất.`,`Vì khích lệ hiệu quả phải thay hoàn toàn phần thưởng vật chất bằng lời khen và sự quan tâm của lãnh đạo.`,`Vì cùng một phần thưởng sẽ tạo động lực như nhau, nên kết quả thấp chủ yếu do nhân viên thiếu trách nhiệm.`], answer:1 },
+  { q:`Một nhân viên giỏi hài lòng với mức lương, phúc lợi và thời gian làm việc nhưng muốn nghỉ vì nhiều năm chỉ làm công việc lặp lại, không được học thêm hay đảm nhận nhiệm vụ mới. Biện pháp nào sau đây đáp ứng trực tiếp nhất nguyên nhân khiến nhân viên muốn rời đi?`,
+    options:[`Tăng trợ cấp ăn trưa và giữ nguyên công việc hiện tại.`,`Điều chỉnh giờ làm việc và tăng thêm ngày nghỉ.`,`Cải tạo khu vực nghỉ ngơi và bổ sung hoạt động giải trí.`,`Giao nhiệm vụ có tính thử thách và hỗ trợ học thêm kỹ năng.`], answer:3 },
+  { q:`Huy mong muốn được tham gia dự án mới để phát triển chuyên môn nhưng nhiều lần không được đáp ứng. Sau một thời gian, anh chuyển sang quan tâm nhiều hơn đến phụ cấp, phúc lợi và các hoạt động giao lưu với đồng nghiệp. Nhu cầu học hỏi vẫn còn, nhưng anh tìm kiếm sự thỏa mãn nhiều hơn ở những phương diện khác. Học thuyết nào sau đây giải thích trực tiếp nhất sự thay đổi này?`,
+    options:[`Học thuyết nhu cầu của Maslow.`,`Học thuyết ERG của Alderfer.`,`Học thuyết kỳ vọng của Vroom.`,`Học thuyết hai nhân tố của Herzberg.`], answer:1 },
+  { q:`Một doanh nghiệp có quỹ thưởng khá cao nhưng tiêu chí đánh giá không rõ ràng; những người có kết quả tương đương lại nhận mức thưởng khác nhau. Nhân viên chưa hài lòng và ít tích cực đóng góp. Để nâng cao hiệu quả quyền lực do đãi ngộ mang lại, lãnh đạo nên ưu tiên cách nào sau đây?`,
+    options:[`Tăng các đợt biểu dương, tiếp tục xác định mức thưởng theo nhận xét riêng của quản lý.`,`Tăng tổng quỹ thưởng, giữ nguyên cách đánh giá để tránh xáo trộn trong quản lý.`,`Công khai tiêu chí, đánh giá công bằng và tìm hiểu mong muốn, nhu cầu của cấp dưới.`,`Giao toàn quyền quyết định thưởng cho trưởng bộ phận, không cần công khai cách đánh giá.`], answer:2 }
+];
+
+const LETTERS = ['A','B','C','D','E'];
+const TOTAL = QUESTIONS.length;
+
+const state = {
+  screen: 'home',
+  current: 0,
+  answers: new Array(TOTAL).fill(null)
+};
+
+const app = document.getElementById('app');
+const modal = document.getElementById('modal');
+const modalTitle = document.getElementById('modal-title');
+const modalMsg = document.getElementById('modal-msg');
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+/* ============ RENDER ============ */
+function render(scrollTop = true) {
+  let html = '';
+  if (state.screen === 'home') html = viewHome();
+  else if (state.screen === 'test') html = viewTest();
+  else if (state.screen === 'result') html = viewResult();
+  else if (state.screen === 'review') html = viewReview();
+  app.innerHTML = html;
+  app.classList.toggle('has-submit', state.screen === 'test');
+  if (scrollTop) window.scrollTo({ top: 0, behavior: 'instant' });
+}
+
+/* ---------- HOME ---------- */
+function viewHome() {
+  return `
+    <div class="card hero">
+      <div class="badge-count">${TOTAL} câu hỏi trắc nghiệm</div>
+      <h1>Nghệ thuật Lãnh đạo</h1>
+      <p class="sub">Ôn tập theo hình thức làm bài test hoặc xem lại toàn bộ đáp án</p>
+      <div class="hero-actions">
+        <button class="btn primary" data-action="start-test">📝 Làm bài test</button>
+        <button class="btn ghost" data-action="review">📖 Xem lại câu hỏi</button>
+      </div>
+    </div>`;
+}
+
+/* ---------- TEST ---------- */
+function viewTest() {
+  const i = state.current;
+  const q = QUESTIONS[i];
+  const answered = state.answers.filter(a => a !== null).length;
+  const pct = Math.round((answered / TOTAL) * 100);
+  const remaining = TOTAL - answered;
+
+  const optionsHtml = q.options.map((opt, j) => `
+    <button class="option ${state.answers[i] === j ? 'selected' : ''}"
+            data-action="select" data-index="${j}">
+      <span class="letter">${LETTERS[j]}</span>
+      <span>${esc(opt)}</span>
+    </button>`).join('');
+
+  const gridHtml = QUESTIONS.map((_, k) => {
+    const cls = k === i ? 'active' : (state.answers[k] !== null ? 'done' : '');
+    return `<button class="gnum ${cls}" data-action="goto" data-index="${k}">${k + 1}</button>`;
+  }).join('');
+
+  return `
+    <div class="topbar">
+      <span class="chip">Câu ${i + 1}/${TOTAL}</span>
+      <div class="progress"><div style="width:${pct}%"></div></div>
+      <span class="chip">${answered}/${TOTAL} đã làm</span>
+    </div>
+
+    <div class="card">
+      <div class="qnum">Câu ${i + 1}</div>
+      <div class="qtext">${esc(q.q)}</div>
+      <div class="options">${optionsHtml}</div>
+    </div>
+
+    <div class="nav">
+      <button class="btn soft" data-action="prev" ${i === 0 ? 'disabled' : ''}>← Câu trước</button>
+      <button class="btn soft" data-action="next" ${i === TOTAL - 1 ? 'disabled' : ''}>Câu sau →</button>
+    </div>
+
+    <div class="card">
+      <div class="grid-title">DANH SÁCH CÂU HỎI</div>
+      <div class="grid">${gridHtml}</div>
+    </div>
+
+    <p class="muted" style="text-align:center;margin-top:12px;">
+      <a href="#" data-action="home" style="color:#64748b;">← Về trang chủ</a>
+    </p>
+
+    <div class="submit-bar">
+      <div class="inner">
+        <div class="hint">
+          ${remaining > 0
+            ? `Còn <b>${remaining}</b> câu chưa trả lời`
+            : `Đã trả lời đủ <b>${TOTAL}</b> câu — sẵn sàng nộp bài`}
+        </div>
+        <button class="btn success" data-action="submit">✅ Nộp bài &amp; xem điểm</button>
+      </div>
+    </div>`;
+}
+
+/* ---------- RESULT ---------- */
+function viewResult() {
+  let score = 0;
+  state.answers.forEach((a, i) => { if (a === QUESTIONS[i].answer) score++; });
+  const pct = Math.round((score / TOTAL) * 100);
+  const deg = Math.round((score / TOTAL) * 360);
+
+  let msg = 'Cần ôn tập thêm 💪';
+  if (pct >= 90) msg = 'Xuất sắc! 🏆';
+  else if (pct >= 75) msg = 'Khá tốt! 👍';
+  else if (pct >= 50) msg = 'Trung bình, ôn thêm nhé 📚';
+
+  const listHtml = QUESTIONS.map((q, i) => {
+    const user = state.answers[i];
+    const correct = q.answer;
+    const isRight = user === correct;
+    const opts = q.options.map((opt, j) => {
+      let cls = 'dim', tag = '';
+      if (j === correct) { cls = 'correct'; tag = '<span class="tag ok">Đáp án đúng</span>'; }
+      else if (j === user) { cls = 'wrong'; tag = '<span class="tag no">Bạn chọn</span>'; }
+      return `<div class="option ${cls}">
+                <span class="letter">${LETTERS[j]}</span>
+                <span>${esc(opt)}${tag}</span>
+              </div>`;
+    }).join('');
+
+    return `
+      <div class="review-item">
+        <div class="qnum">Câu ${i + 1} ${isRight
+          ? '<span class="tag ok">Đúng</span>'
+          : '<span class="tag no">Sai</span>'}</div>
+        <div class="qtext" style="font-size:15.5px;">${esc(q.q)}</div>
+        <div class="options">${opts}</div>
+        ${user === null ? '<div class="answer-note" style="background:#fef2f2;color:#b91c1c;">Bạn chưa trả lời câu này.</div>' : ''}
+      </div>
+      ${i < TOTAL - 1 ? '<div class="divider"></div>' : ''}`;
+  }).join('');
+
+  return `
+    <div class="card result-head">
+      <div class="score-ring" style="background: conic-gradient(#16a34a ${deg}deg, #e2e8f0 0);">
+        <div class="inner">
+          <div class="score-num">${score}/${TOTAL}</div>
+          <div class="score-lbl">${pct}%</div>
+        </div>
+      </div>
+      <div class="result-msg">${msg}</div>
+      <p class="muted">Bạn đã hoàn thành bài test Nghệ thuật Lãnh đạo</p>
+      <div class="stat-row">
+        <div class="stat"><b style="color:#16a34a">${score}</b><span>Câu đúng</span></div>
+        <div class="stat"><b style="color:#dc2626">${TOTAL - score}</b><span>Câu sai</span></div>
+        <div class="stat"><b>${pct}%</b><span>Tỉ lệ đúng</span></div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+      <button class="btn primary" style="flex:1;min-width:150px;" data-action="retry">🔄 Làm lại</button>
+      <button class="btn ghost" style="flex:1;min-width:150px;" data-action="review">📖 Xem lại câu hỏi</button>
+      <button class="btn soft" style="flex:1;min-width:150px;" data-action="home">🏠 Trang chủ</button>
+    </div>
+
+    <div class="card">
+      <div class="grid-title">CHI TIẾT BÀI LÀM</div>
+      ${listHtml}
+    </div>`;
+}
+
+/* ---------- REVIEW ---------- */
+function viewReview() {
+  const listHtml = QUESTIONS.map((q, i) => {
+    const opts = q.options.map((opt, j) => `
+      <div class="option ${j === q.answer ? 'correct' : 'dim'}">
+        <span class="letter">${LETTERS[j]}</span>
+        <span>${esc(opt)}${j === q.answer ? '<span class="tag ok">Đáp án</span>' : ''}</span>
+      </div>`).join('');
+    return `
+      <div class="review-item">
+        <div class="qnum">Câu ${i + 1}</div>
+        <div class="qtext" style="font-size:15.5px;">${esc(q.q)}</div>
+        <div class="options">${opts}</div>
+        <div class="answer-note">✔ Đáp án đúng: ${LETTERS[q.answer]}. ${esc(q.options[q.answer])}</div>
+      </div>
+      ${i < TOTAL - 1 ? '<div class="divider"></div>' : ''}`;
+  }).join('');
+
+  return `
+    <div class="page-title">📖 Xem lại câu hỏi</div>
+    <p class="page-sub">Toàn bộ ${TOTAL} câu hỏi kèm đáp án đúng được đánh dấu màu xanh.</p>
+    <div style="display:flex;gap:10px;margin-bottom:16px;">
+      <button class="btn primary" style="flex:1;" data-action="start-test">📝 Làm bài test</button>
+      <button class="btn soft" style="flex:1;" data-action="home">🏠 Trang chủ</button>
+    </div>
+    <div class="card">${listHtml}</div>`;
+}
+
+/* ============ MODAL ============ */
+function openSubmitModal() {
+  const remaining = state.answers.filter(a => a === null).length;
+  modalTitle.textContent = remaining > 0 ? 'Còn câu chưa trả lời' : 'Nộp bài?';
+  modalMsg.innerHTML = remaining > 0
+    ? `Bạn còn <b>${remaining}</b> câu chưa trả lời. Các câu bỏ trống sẽ tính là sai. Vẫn nộp bài?`
+    : `Bạn đã trả lời đủ <b>${TOTAL}</b> câu. Nộp bài để xem điểm ngay?`;
+  modal.hidden = false;
+}
+function closeModal() { modal.hidden = true; }
+
+modal.addEventListener('click', (e) => {
+  const btn = e.target.closest('[data-modal]');
+  if (!btn) {
+    if (e.target === modal) closeModal();
+    return;
+  }
+  if (btn.dataset.modal === 'cancel') { closeModal(); return; }
+  if (btn.dataset.modal === 'confirm') {
+    closeModal();
+    state.screen = 'result';
+    render();
+  }
+});
+
+/* ============ EVENTS ============ */
+app.addEventListener('click', (e) => {
+  const el = e.target.closest('[data-action]');
+  if (!el) return;
+  e.preventDefault();
+  const action = el.dataset.action;
+  const idx = el.dataset.index !== undefined ? Number(el.dataset.index) : null;
+
+  switch (action) {
+    case 'home':
+      state.screen = 'home'; render(); break;
+
+    case 'start-test':
+      state.screen = 'test'; state.current = 0;
+      state.answers = new Array(TOTAL).fill(null);
+      render(); break;
+
+    case 'review':
+      state.screen = 'review'; render(); break;
+
+    case 'retry':
+      state.screen = 'test'; state.current = 0;
+      state.answers = new Array(TOTAL).fill(null);
+      render(); break;
+
+    case 'select':
+      state.answers[state.current] = idx;
+      render(false);
+      break;
+
+    case 'goto':
+      state.current = idx; render(); break;
+
+    case 'prev':
+      if (state.current > 0) { state.current--; render(); } break;
+
+    case 'next':
+      if (state.current < TOTAL - 1) { state.current++; render(); } break;
+
+    case 'submit':
+      openSubmitModal();
+      break;
+  }
+});
+
+render(false);
+</script>
+</body>
+</html>
